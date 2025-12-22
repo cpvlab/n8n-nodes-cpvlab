@@ -1,0 +1,16 @@
+{
+    "node": "manage-landing-pages",
+    "nodeVersion": "1.0",
+    "codexVersion": "1.0",
+    "categories": [
+        "Marketing",
+        "API"
+    ],
+    "resources": {
+        "primaryDocumentation": [
+            {
+                "url": "https://thdev.testinglab.pro/api/v2/doc/#api-Landing_Pages"
+            }
+        ]
+    }
+}
