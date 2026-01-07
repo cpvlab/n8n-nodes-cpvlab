@@ -341,12 +341,14 @@ This node uses CPV Lab Pro API credentials configured in your n8n instance. Set 
 
 #### Add Landing Page
 
-| Field      | Description                                                           | Required | Type                            |
-| ---------- | --------------------------------------------------------------------- | -------- | ------------------------------- |
-| **Name**   | The landing page name                                                 | Yes      | String                          |
-| **URL**    | The complete landing page URL (should start with http:// or https://) | Yes      | String                          |
-| **Status** | Whether the page is active or inactive                                | No       | Options: `active` \| `inactive` |
-| **Notes**  | Details or description of the landing page                            | No       | String                          |
+| Field         | Description                                                           | Required | Type                            |
+| ------------- | --------------------------------------------------------------------- | -------- | ------------------------------- |
+| **Name**      | The landing page name                                                 | Yes      | String                          |
+| **URL**       | The complete landing page URL (should start with http:// or https://) | Yes      | String                          |
+| **Status**    | Whether the page is active or inactive                                | No       | Options: `active` \| `inactive` |
+| **Notes**     | Details or description of the landing page                            | No       | String                          |
+| **Group**     | Assign to an existing group                                           | No       | String                          |
+| **New Group** | Create a new group for this landing page                              | No       | String                          |
 
 #### Edit Landing Page
 
@@ -357,6 +359,7 @@ This node uses CPV Lab Pro API credentials configured in your n8n instance. Set 
 | **URL**     | The landing page URL                       | No       | String                          |
 | **Status**  | Whether the page is active or inactive     | No       | Options: `active` \| `inactive` |
 | **Notes**   | Details or description of the landing page | No       | String                          |
+| **Group**   | Assign to an existing group                | No       | String                          |
 
 #### Add Landing Page To Campaign
 
@@ -409,14 +412,16 @@ This node uses CPV Lab Pro API credentials configured in your n8n instance. Set 
 
 #### Add Offer
 
-| Field      | Description                                                     | Required | Type                            |
-| ---------- | --------------------------------------------------------------- | -------- | ------------------------------- |
-| **Name**   | The offer name                                                  | Yes      | String                          |
-| **URL**    | The complete offer URL (should start with http:// or https://)  | Yes      | String                          |
-| **Source** | Offer source (affiliate network) that must exist in CPV Lab Pro | Yes      | String                          |
-| **Payout** | Offer payout (revenue)                                          | Yes      | Number                          |
-| **Status** | Whether the offer is active or inactive                         | No       | Options: `active` \| `inactive` |
-| **Notes**  | Details or description of the offer                             | No       | String                          |
+| Field         | Description                                                     | Required | Type                            |
+| ------------- | --------------------------------------------------------------- | -------- | ------------------------------- |
+| **Name**      | The offer name                                                  | Yes      | String                          |
+| **URL**       | The complete offer URL (should start with http:// or https://)  | Yes      | String                          |
+| **Source**    | Offer source (affiliate network) that must exist in CPV Lab Pro | Yes      | String                          |
+| **Payout**    | Offer payout (revenue)                                          | Yes      | Number                          |
+| **Status**    | Whether the offer is active or inactive                         | No       | Options: `active` \| `inactive` |
+| **Notes**     | Details or description of the offer                             | No       | String                          |
+| **Group**     | Assign to an existing group                                     | No       | String                          |
+| **New Group** | Create a new group for this offer                               | No       | String                          |
 
 #### Edit Offer
 
@@ -429,6 +434,7 @@ This node uses CPV Lab Pro API credentials configured in your n8n instance. Set 
 | **Payout**   | Offer payout (revenue)                  | No       | Number                          |
 | **Status**   | Whether the offer is active or inactive | No       | Options: `active` \| `inactive` |
 | **Notes**    | Details or description of the offer     | No       | String                          |
+| **Group**    | Assign to an existing group             | No       | String                          |
 
 #### Add Offer To Campaign
 
@@ -583,5 +589,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ---
 
-**Last Updated:** December 22, 2025  
+**Last Updated:** January 7, 2026  
 **Package Version:** 1.0.0
