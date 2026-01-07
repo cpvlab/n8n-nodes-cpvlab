@@ -198,6 +198,30 @@ export class ManageOffers implements INodeType {
                 }
             },
             {
+                displayName: 'Group',
+                name: 'group',
+                type: 'string',
+                default: 'Default',
+                description: 'The group name the offer belongs to',
+                displayOptions: {
+                    show: {
+                        operation: ['add-offer']
+                    }
+                }
+            },
+            {
+                displayName: 'New Group',
+                name: 'new_group',
+                type: 'string',
+                default: '',
+                description: 'The name of a new group to create and assign the offer to',
+                displayOptions: {
+                    show: {
+                        operation: ['add-offer']
+                    }
+                }
+            },
+            {
                 displayName: 'Notes',
                 name: 'notes_edit',
                 type: 'string',
@@ -206,6 +230,18 @@ export class ManageOffers implements INodeType {
                     rows: 2
                 },
                 description: 'Details or description of the offer',
+                displayOptions: {
+                    show: {
+                        operation: ['edit-offer']
+                    }
+                }
+            },
+            {
+                displayName: 'Group',
+                name: 'group_edit',
+                type: 'string',
+                default: '',
+                description: 'The group name the offer belongs to',
                 displayOptions: {
                     show: {
                         operation: ['edit-offer']
@@ -380,6 +416,8 @@ export class ManageOffers implements INodeType {
                     const payout = this.getNodeParameter('payout', i, '') as string;
                     const status = this.getNodeParameter('status', i, 'active') as string;
                     const notes = this.getNodeParameter('notes', i, '') as string;
+                    const group = this.getNodeParameter('group', i, 'Default') as string;
+                    const newGroup = this.getNodeParameter('new_group', i, '') as string;
 
                     // Build request body
 
@@ -394,6 +432,12 @@ export class ManageOffers implements INodeType {
                     if (notes !== '')
                         body.notes = notes;
 
+                    if (group !== '')
+                        body.group = group;
+
+                    if (newGroup !== '')
+                        body.new_group = newGroup;
+
                     apiUrl = `${baseUrl}/api/v2/offers/`;
                     method = 'POST';
                 } else if (operation === 'edit-offer') {
@@ -406,6 +450,7 @@ export class ManageOffers implements INodeType {
                     const payoutEdit = this.getNodeParameter('payout_edit', i, '') as string;
                     const statusEdit = this.getNodeParameter('status_edit', i, '') as string;
                     const notesEdit = this.getNodeParameter('notes_edit', i, '') as string;
+                    const groupEdit = this.getNodeParameter('group_edit', i, '') as string;
 
                     // Build request body
 
@@ -428,6 +473,9 @@ export class ManageOffers implements INodeType {
 
                     if (notesEdit !== '')
                         body.notes = notesEdit;
+
+                    if (groupEdit !== '')
+                        body.group = groupEdit;
 
                     apiUrl = `${baseUrl}/api/v2/offers/${id}`;
                     method = 'PUT';
