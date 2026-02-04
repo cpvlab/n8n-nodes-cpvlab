@@ -467,14 +467,33 @@ export class ManageStats implements INodeType {
                 } else
                     returnData.push({ json: response } as INodeExecutionData);
             } catch (error) {
+                const errorResponse: any = {};
+                const errorObj = error as any;
+
+                if (errorObj.response) {
+                    let errorData = errorObj.response.data;
+
+                    if (typeof errorData === 'string')
+                        errorData = JSON.parse(errorData);
+
+                    if (typeof errorData === 'object' && errorData !== null) {
+                        if (errorData.status !== undefined)
+                            errorResponse.status = errorData.status;
+
+                        if (errorData.message !== undefined)
+                            errorResponse.message = errorData.message;
+                    }
+                } else if (errorObj.message)
+                    errorResponse.message = errorObj.message;
+
                 if (this.continueOnFail()) {
-                    returnData.push({ json: { error: (error as Error).message } } as INodeExecutionData);
+                    returnData.push({ json: errorResponse } as INodeExecutionData);
 
                     continue;
                 }
 
-                if ((error as any).context) {
-                    (error as any).context.i = i;
+                if (errorObj.context) {
+                    errorObj.context.i = i;
 
                     throw error;
                 }
