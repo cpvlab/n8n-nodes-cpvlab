@@ -1,10 +1,11 @@
-import type { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
+import type { IDataObject, IExecuteFunctions, IHttpRequestMethods, IHttpRequestOptions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
 export class ManageCampaigns implements INodeType {
     public description: INodeTypeDescription = {
-        name: 'ManageCampaigns',
+        name: 'manageCampaigns',
         displayName: 'Manage Campaigns',
+        usableAsTool: true,
         icon: {
             light: 'file:../../icons/cpvlabpro.svg',
             dark: 'file:../../icons/cpvlabpro.dark.svg'
@@ -28,11 +29,12 @@ export class ManageCampaigns implements INodeType {
                 displayName: 'Operation',
                 name: 'operation',
                 type: 'options',
+                noDataExpression: true,
                 options: [
-                    { name: 'Get Campaigns', value: 'get-campaigns' },
-                    { name: 'Get Conversions', value: 'get-conversions' },
-                    { name: 'Edit Campaign Options', value: 'edit-options' },
-                    { name: 'Edit Page From Campaign', value: 'edit-page' }
+                    { name: 'Get Campaigns', action: 'Get campaigns', value: 'get-campaigns' },
+                    { name: 'Get Conversions', action: 'Get conversions', value: 'get-conversions' },
+                    { name: 'Edit Campaign Options', action: 'Edit campaign options', value: 'edit-options' },
+                    { name: 'Edit Page From Campaign', action: 'Edit page from campaign', value: 'edit-page' }
                 ],
                 default: 'get-campaigns',
                 required: true,
@@ -44,7 +46,7 @@ export class ManageCampaigns implements INodeType {
                 type: 'string',
                 default: '',
                 required: true,
-                description: 'The campaign ID',
+                description: 'The campaign ID to edit',
                 displayOptions: {
                     show: {
                         operation: ['edit-options', 'edit-page']
@@ -84,7 +86,7 @@ export class ManageCampaigns implements INodeType {
                 name: 'filter_campaign_name',
                 type: 'string',
                 default: '',
-                description: 'Filter results by campaign name (case-insensitive, partial match).',
+                description: 'Filter results by campaign name (case-insensitive, partial match)',
                 displayOptions: {
                     show: {
                         operation: ['get-campaigns']
@@ -96,7 +98,7 @@ export class ManageCampaigns implements INodeType {
                 name: 'filter_source_name',
                 type: 'string',
                 default: '',
-                description: 'Filter results by traffic source name (case-insensitive, partial match).',
+                description: 'Filter results by traffic source name (case-insensitive, partial match)',
                 displayOptions: {
                     show: {
                         operation: ['get-campaigns']
@@ -108,7 +110,7 @@ export class ManageCampaigns implements INodeType {
                 name: 'filter_group_name',
                 type: 'string',
                 default: '',
-                description: 'Filter results by group name (case-insensitive, partial match).',
+                description: 'Filter results by group name (case-insensitive, partial match)',
                 displayOptions: {
                     show: {
                         operation: ['get-campaigns']
@@ -139,12 +141,12 @@ export class ManageCampaigns implements INodeType {
                 default: 'all',
                 options: [
                     { name: "All", value: "all" },
-                    { name: "Lead Capture / Opt-In Campaign", value: "lc" },
-                    { name: "Multiple Path Campaign", value: "mp" },
-                    { name: "Landing Page Sequence Campaign", value: "lps" },
-                    { name: "Multiple Option Campaign", value: "mo" },
                     { name: "Direct Link & Landing Page Campaign", value: "dllp" },
-                    { name: "Email Follow-Up Campaign", value: "email" }
+                    { name: "Email Follow-Up Campaign", value: "email" },
+                    { name: "Landing Page Sequence Campaign", value: "lps" },
+                    { name: "Lead Capture / Opt-In Campaign", value: "lc" },
+                    { name: "Multiple Option Campaign", value: "mo" },
+                    { name: "Multiple Path Campaign", value: "mp" }
                 ],
                 description: 'Filter campaigns by campaign type. Allowed values: \'all\', \'lc\', \'mp\', \'lps\', \'mo\', \'dllp\', \'email\'. Default is \'all\'.',
                 displayOptions: {
@@ -160,13 +162,13 @@ export class ManageCampaigns implements INodeType {
                 default: 'all',
                 options: [
                     { name: 'All', value: 'all' },
-                    { name: 'Today', value: 'today' },
-                    { name: 'Yesterday', value: 'yesterday' },
-                    { name: 'Past 7 Days', value: 'past_7_days' },
+                    { name: 'Last Month', value: 'last_month' },
                     { name: 'Past 14 Days', value: 'past_14_days' },
                     { name: 'Past 30 Days', value: 'past_30_days' },
+                    { name: 'Past 7 Days', value: 'past_7_days' },
                     { name: 'This Month', value: 'this_month' },
-                    { name: 'Last Month', value: 'last_month' }
+                    { name: 'Today', value: 'today' },
+                    { name: 'Yesterday', value: 'yesterday' }
                 ],
                 description: 'Filter by time interval. Allowed values: \'all\', \'today\', \'yesterday\', \'past_7_days\', \'past_14_days\', \'past_30_days\', \'this_month\', \'last_month\'. Default is \'all\'.',
                 displayOptions: {
@@ -183,13 +185,13 @@ export class ManageCampaigns implements INodeType {
                 options: [
                     { name: 'All', value: 'all' },
                     { name: 'Custom', value: 'custom' },
-                    { name: 'Today', value: 'today' },
-                    { name: 'Yesterday', value: 'yesterday' },
-                    { name: 'Past 7 Days', value: 'past_7_days' },
+                    { name: 'Last Month', value: 'last_month' },
                     { name: 'Past 14 Days', value: 'past_14_days' },
                     { name: 'Past 30 Days', value: 'past_30_days' },
+                    { name: 'Past 7 Days', value: 'past_7_days' },
                     { name: 'This Month', value: 'this_month' },
-                    { name: 'Last Month', value: 'last_month' }
+                    { name: 'Today', value: 'today' },
+                    { name: 'Yesterday', value: 'yesterday' }
                 ],
                 description: 'Filter by time interval',
                 displayOptions: {
@@ -245,7 +247,7 @@ export class ManageCampaigns implements INodeType {
                     { name: 'Descending', value: 'desc' }
                 ],
                 default: 'asc',
-                description: 'Sort order',
+                description: 'Order of sorting',
                 displayOptions: {
                     show: {
                         operation: ['get-conversions']
@@ -434,7 +436,7 @@ export class ManageCampaigns implements INodeType {
                 const credentials = await this.getCredentials('cpvLabProApi');
 
                 if (!credentials)
-                    throw new Error('CpvLabPro API credentials not configured');
+                    throw new NodeOperationError(this.getNode(), 'CpvLabPro API credentials not configured', { itemIndex: i });
 
                 const baseUrl = credentials.base_url as string;
                 const apiKey = credentials.api_key as string;
@@ -445,9 +447,8 @@ export class ManageCampaigns implements INodeType {
 
                 let apiUrl: string = '';
                 let method: string = 'GET';
-                let qs: any = {};
-                let body: any = {};
-                let response: any;
+                const qs: IDataObject = {};
+                const body: IDataObject = {};
 
                 if (operation === 'get-campaigns') {
                     // Get parameters for Get Campaigns operation.
@@ -465,7 +466,7 @@ export class ManageCampaigns implements INodeType {
                     if (fields && Array.isArray(fields) && fields.length)
                         qs.fields = fields;
 
-                    const filter: any = {};
+                    const filter: IDataObject = {};
 
                     if (filterCampaignName)
                         filter.campaign_name = filterCampaignName;
@@ -506,7 +507,7 @@ export class ManageCampaigns implements INodeType {
                     if (fields && Array.isArray(fields) && fields.length)
                         qs.fields = fields;
 
-                    const filter: any = {};
+                    const filter: IDataObject = {};
 
                     filter.interval = filterInterval;
 
@@ -522,7 +523,7 @@ export class ManageCampaigns implements INodeType {
                         qs.filter = filter;
 
                     if (sortField) {
-                        const sort: any = {};
+                        const sort: IDataObject = {};
 
                         if (sortField)
                             sort.field = sortField;
@@ -606,8 +607,8 @@ export class ManageCampaigns implements INodeType {
 
                 // Make the HTTP request to the CpvLabPro API.
 
-                const requestOptions: any = {
-                    method: method,
+                const requestOptions: IHttpRequestOptions = {
+                    method: method as IHttpRequestMethods,
                     url: apiUrl,
                     headers: {
                         'API-Key': apiKey
@@ -618,11 +619,11 @@ export class ManageCampaigns implements INodeType {
                 if (method === 'GET' && Object.keys(qs).length > 0)
                     requestOptions.qs = qs;
                 else if (method === 'PUT' && Object.keys(body).length > 0) {
-                    requestOptions.headers['Content-Type'] = 'application/json';
+                    requestOptions.headers!['Content-Type'] = 'application/json';
                     requestOptions.body = body;
                 }
 
-                response = await this.helpers.httpRequest(requestOptions);
+                const response = await this.helpers.httpRequest(requestOptions);
 
                 // Process the response and add it to the return data.
 
@@ -632,11 +633,10 @@ export class ManageCampaigns implements INodeType {
                 } else
                     returnData.push({ json: response } as INodeExecutionData);
             } catch (error) {
-                const errorResponse: any = {};
-                const errorObj = error as any;
+                const errorResponse: { status: number, message: string } = { status: 0, message: '' };
 
-                if (errorObj.response) {
-                    let errorData = errorObj.response.data;
+                if (error.response) {
+                    let errorData = error.response.data;
 
                     if (typeof errorData === 'string')
                         errorData = JSON.parse(errorData);
@@ -648,8 +648,8 @@ export class ManageCampaigns implements INodeType {
                         if (errorData.message !== undefined)
                             errorResponse.message = errorData.message;
                     }
-                } else if (errorObj.message)
-                    errorResponse.message = errorObj.message;
+                } else if (error.message)
+                    errorResponse.message = error.message;
 
                 if (this.continueOnFail()) {
                     returnData.push({ json: errorResponse } as INodeExecutionData);
@@ -657,8 +657,8 @@ export class ManageCampaigns implements INodeType {
                     continue;
                 }
 
-                if (errorObj.context) {
-                    errorObj.context.i = i;
+                if (error.context) {
+                    error.context.i = i;
 
                     throw error;
                 }

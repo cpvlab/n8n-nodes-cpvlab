@@ -1,10 +1,11 @@
-import type { IExecuteFunctions, IHttpRequestMethods, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
+import type { IDataObject, IExecuteFunctions, IHttpRequestMethods, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
 export class ManageOffers implements INodeType {
     public description: INodeTypeDescription = {
-        name: 'ManageOffers',
+        name: 'manageOffers',
         displayName: 'Manage Offer',
+        usableAsTool: true,
         icon: {
             light: 'file:../../icons/cpvlabpro.svg',
             dark: 'file:../../icons/cpvlabpro.dark.svg'
@@ -28,10 +29,11 @@ export class ManageOffers implements INodeType {
                 displayName: 'Operation',
                 name: 'operation',
                 type: 'options',
+                noDataExpression: true,
                 options: [
-                    { name: 'Add Offer', value: 'add-offer' },
-                    { name: 'Edit Offer', value: 'edit-offer' },
-                    { name: 'Add Offer To Campaign', value: 'add-to-campaign' }
+                    { name: 'Add Offer', action: 'Add offer', value: 'add-offer' },
+                    { name: 'Edit Offer', action: 'Edit offer', value: 'edit-offer' },
+                    { name: 'Add Offer To Campaign', action: 'Add offer to campaign', value: 'add-to-campaign' }
                 ],
                 default: 'add-offer',
                 required: true,
@@ -43,7 +45,7 @@ export class ManageOffers implements INodeType {
                 type: 'string',
                 default: '',
                 required: true,
-                description: 'The offer ID',
+                description: 'The ID of the offer to edit',
                 displayOptions: {
                     show: {
                         operation: ['edit-offer']
@@ -174,7 +176,7 @@ export class ManageOffers implements INodeType {
                     { name: 'Active', value: 'active' },
                     { name: 'Inactive', value: 'inactive' }
                 ],
-                default: '',
+                default: 'active',
                 description: 'Whether the offer is active or inactive',
                 displayOptions: {
                     show: {
@@ -254,7 +256,7 @@ export class ManageOffers implements INodeType {
                 type: 'string',
                 default: '',
                 required: true,
-                description: 'The campaign ID',
+                description: 'The ID of the campaign to which the offer will be added',
                 displayOptions: {
                     show: {
                         operation: ['add-to-campaign']
@@ -354,7 +356,7 @@ export class ManageOffers implements INodeType {
                 name: 'page_id',
                 type: 'number',
                 default: '',
-                description: 'The page ID',
+                description: 'The page ID for the offer',
                 displayOptions: {
                     show: {
                         operation: ['add-to-campaign']
@@ -366,7 +368,7 @@ export class ManageOffers implements INodeType {
                 name: 'path_id',
                 type: 'number',
                 default: '',
-                description: 'The path ID',
+                description: 'The path ID for the offer',
                 displayOptions: {
                     show: {
                         operation: ['add-to-campaign']
@@ -394,7 +396,7 @@ export class ManageOffers implements INodeType {
                 const credentials = await this.getCredentials('cpvLabProApi');
 
                 if (!credentials)
-                    throw new Error('CpvLabPro API credentials not configured');
+                    throw new NodeOperationError(this.getNode(), 'CpvLabPro API credentials not configured', { itemIndex: i });
 
                 const baseUrl = credentials.base_url as string;
                 const apiKey = credentials.api_key as string;
@@ -405,7 +407,7 @@ export class ManageOffers implements INodeType {
 
                 let apiUrl: string = '';
                 let method: IHttpRequestMethods = 'POST';
-                let body: any;
+                let body: IDataObject = {};
 
                 if (operation === 'add-offer') {
                     // Get parameters for add operation.
@@ -547,11 +549,10 @@ export class ManageOffers implements INodeType {
 
                 returnData.push({ json: response } as INodeExecutionData);
             } catch (error) {
-                const errorResponse: any = {};
-                const errorObj = error as any;
+                const errorResponse: { status: number, message: string } = { status: 0, message: '' };
 
-                if (errorObj.response) {
-                    let errorData = errorObj.response.data;
+                if (error.response) {
+                    let errorData = error.response.data;
 
                     if (typeof errorData === 'string')
                         errorData = JSON.parse(errorData);
@@ -563,8 +564,8 @@ export class ManageOffers implements INodeType {
                         if (errorData.message !== undefined)
                             errorResponse.message = errorData.message;
                     }
-                } else if (errorObj.message)
-                    errorResponse.message = errorObj.message;
+                } else if (error.message)
+                    errorResponse.message = error.message;
 
                 if (this.continueOnFail()) {
                     returnData.push({ json: errorResponse } as INodeExecutionData);
@@ -572,8 +573,8 @@ export class ManageOffers implements INodeType {
                     continue;
                 }
 
-                if (errorObj.context) {
-                    errorObj.context.i = i;
+                if (error.context) {
+                    error.context.i = i;
 
                     throw error;
                 }

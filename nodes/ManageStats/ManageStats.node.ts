@@ -1,10 +1,11 @@
-import type { IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
+import type { IDataObject, IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
 import { NodeOperationError } from 'n8n-workflow';
 
 export class ManageStats implements INodeType {
     public description: INodeTypeDescription = {
-        name: 'ManageStats',
+        name: 'manageStats',
         displayName: 'Manage Stats',
+        usableAsTool: true,
         icon: {
             light: 'file:../../icons/cpvlabpro.svg',
             dark: 'file:../../icons/cpvlabpro.dark.svg'
@@ -28,15 +29,15 @@ export class ManageStats implements INodeType {
                 displayName: 'Operation',
                 name: 'operation',
                 type: 'options',
+                noDataExpression: true,
                 options: [
-                    { name: 'Get Target Stats', value: 'target-stats' },
-                    { name: 'Get Ad Stats', value: 'ad-stats' },
-                    { name: 'Get Landing Stats', value: 'landing-stats' },
-                    { name: 'Get Offer Stats', value: 'offer-stats' },
-                    { name: 'Get Performance Stats', value: 'performance-stats' },
-                    { name: 'Get Visitor Stats', value: 'visitor-stats' },
-                    { name: 'Get Sub ID Stats', value: 'subid-lookup' }
-
+                    { name: 'Get Ad Stats', action: 'Get ad stats', value: 'ad-stats' },
+                    { name: 'Get Landing Stats', action: 'Get landing stats', value: 'landing-stats' },
+                    { name: 'Get Offer Stats', action: 'Get offer stats', value: 'offer-stats' },
+                    { name: 'Get Performance Stats', action: 'Get performance stats', value: 'performance-stats' },
+                    { name: 'Get Sub ID Stats', action: 'Get sub id stats', value: 'subid-lookup' },
+                    { name: 'Get Target Stats', action: 'Get target stats', value: 'target-stats' },
+                    { name: 'Get Visitor Stats', action: 'Get visitor stats', value: 'visitor-stats' }
                 ],
                 default: 'target-stats',
                 required: true,
@@ -48,7 +49,7 @@ export class ManageStats implements INodeType {
                 type: 'string',
                 default: '',
                 required: true,
-                description: 'The campaign id to fetch stats for',
+                description: 'The campaign ID to fetch stats for',
                 displayOptions: {
                     show: {
                         operation: ['target-stats', 'ad-stats', 'landing-stats', 'offer-stats', 'performance-stats']
@@ -63,7 +64,6 @@ export class ManageStats implements INodeType {
                 typeOptions: {
                     multipleValues: true
                 },
-                required: false,
                 description: 'Campaign IDs to fetch visitor stats for',
                 displayOptions: {
                     show: {
@@ -190,13 +190,13 @@ export class ManageStats implements INodeType {
                 type: 'options',
                 options: [
                     { name: '24 Hours', value: '24_hours' },
-                    { name: 'Today', value: 'today' },
-                    { name: 'Yesterday', value: 'yesterday' },
-                    { name: 'Past 7 Days', value: 'past_7_days' },
+                    { name: 'Last Month', value: 'last_month' },
                     { name: 'Past 14 Days', value: 'past_14_days' },
                     { name: 'Past 30 Days', value: 'past_30_days' },
+                    { name: 'Past 7 Days', value: 'past_7_days' },
                     { name: 'This Month', value: 'this_month' },
-                    { name: 'Last Month', value: 'last_month' }
+                    { name: 'Today', value: 'today' },
+                    { name: 'Yesterday', value: 'yesterday' }
                 ],
                 default: '24_hours',
                 description: 'Filter by time interval',
@@ -213,13 +213,13 @@ export class ManageStats implements INodeType {
                 options: [
                     { name: 'All', value: 'all' },
                     { name: 'Custom', value: 'custom' },
-                    { name: 'Today', value: 'today' },
-                    { name: 'Yesterday', value: 'yesterday' },
-                    { name: 'Past 7 Days', value: 'past_7_days' },
+                    { name: 'Last Month', value: 'last_month' },
                     { name: 'Past 14 Days', value: 'past_14_days' },
                     { name: 'Past 30 Days', value: 'past_30_days' },
+                    { name: 'Past 7 Days', value: 'past_7_days' },
                     { name: 'This Month', value: 'this_month' },
-                    { name: 'Last Month', value: 'last_month' }
+                    { name: 'Today', value: 'today' },
+                    { name: 'Yesterday', value: 'yesterday' }
                 ],
                 default: 'today',
                 description: 'Filter by time interval',
@@ -276,7 +276,7 @@ export class ManageStats implements INodeType {
                     { name: 'Descending', value: 'desc' }
                 ],
                 default: 'desc',
-                description: 'Sort order',
+                description: 'Order of sorting',
                 displayOptions: {
                     show: {
                         operation: ['target-stats', 'ad-stats', 'landing-stats', 'offer-stats', 'visitor-stats']
@@ -298,7 +298,7 @@ export class ManageStats implements INodeType {
                 const credentials = await this.getCredentials('cpvLabProApi');
 
                 if (!credentials)
-                    throw new Error('CpvLabPro API credentials not configured');
+                    throw new NodeOperationError(this.getNode(), 'CpvLabPro API credentials not configured', { itemIndex: i });
 
                 const baseUrl = credentials.base_url as string;
                 const apiKey = credentials.api_key as string;
@@ -324,7 +324,7 @@ export class ManageStats implements INodeType {
 
                 // Build query parameters based on user input.
 
-                let qs: any = {};
+                const qs: IDataObject = {};
                 let apiUrl: string;
 
                 if (operation == 'target-stats') {
@@ -336,7 +336,7 @@ export class ManageStats implements INodeType {
                     if (groupFields && groupFields.length > 0)
                         qs.group_fields = groupFields;
 
-                    const filter: any = {};
+                    const filter: IDataObject = {};
 
                     filter.interval = filterIntervalOne;
 
@@ -352,7 +352,7 @@ export class ManageStats implements INodeType {
                         qs.filter = filter;
 
                     if (sortField || sortOrder !== 'desc') {
-                        const sort: any = {};
+                        const sort: IDataObject = {};
 
                         if (sortField)
                             sort.field = sortField;
@@ -365,7 +365,7 @@ export class ManageStats implements INodeType {
 
                     apiUrl = `${baseUrl}/api/v2/stats/${campaignId}/${operation}`;
                 } else if (operation === 'ad-stats' || operation === 'landing-stats' || operation === 'offer-stats') {
-                    const filter: any = {};
+                    const filter: IDataObject = {};
 
                     filter.interval = filterIntervalOne;
 
@@ -381,7 +381,7 @@ export class ManageStats implements INodeType {
                         qs.filter = filter;
 
                     if (sortField || sortOrder !== 'desc') {
-                        const sort: any = {};
+                        const sort: IDataObject = {};
 
                         if (sortField)
                             sort.field = sortField;
@@ -397,7 +397,7 @@ export class ManageStats implements INodeType {
                     qs.campaign_ids = campaignIds;
                     qs.records = records;
 
-                    const filter: any = {};
+                    const filter: IDataObject = {};
 
                     if (filterIp)
                         filter.ip = filterIp;
@@ -414,7 +414,7 @@ export class ManageStats implements INodeType {
                         qs.filter = filter;
 
                     if (sortField || sortOrder !== 'desc') {
-                        const sort: any = {};
+                        const sort: IDataObject = {};
 
                         if (sortField)
                             sort.field = sortField;
@@ -429,7 +429,7 @@ export class ManageStats implements INodeType {
                 } else if (operation === 'subid-lookup') {
                     apiUrl = `${baseUrl}/api/v2/stats/subid-lookup/${subId}`;
                 } else {
-                    const filter: any = {};
+                    const filter: IDataObject = {};
 
                     filter.interval = filterIntervalOne;
 
@@ -467,11 +467,10 @@ export class ManageStats implements INodeType {
                 } else
                     returnData.push({ json: response } as INodeExecutionData);
             } catch (error) {
-                const errorResponse: any = {};
-                const errorObj = error as any;
+                const errorResponse: { status: number, message: string } = { status: 0, message: '' };
 
-                if (errorObj.response) {
-                    let errorData = errorObj.response.data;
+                if (error.response) {
+                    let errorData = error.response.data;
 
                     if (typeof errorData === 'string')
                         errorData = JSON.parse(errorData);
@@ -483,8 +482,8 @@ export class ManageStats implements INodeType {
                         if (errorData.message !== undefined)
                             errorResponse.message = errorData.message;
                     }
-                } else if (errorObj.message)
-                    errorResponse.message = errorObj.message;
+                } else if (error.message)
+                    errorResponse.message = error.message;
 
                 if (this.continueOnFail()) {
                     returnData.push({ json: errorResponse } as INodeExecutionData);
@@ -492,8 +491,8 @@ export class ManageStats implements INodeType {
                     continue;
                 }
 
-                if (errorObj.context) {
-                    errorObj.context.i = i;
+                if (error.context) {
+                    error.context.i = i;
 
                     throw error;
                 }
