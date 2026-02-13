@@ -1,7 +1,7 @@
 {
 	"name": "n8n-nodes-cpvlab",
 	"description": "CPV One is a powerful and affordable Ad and Affiliate Tracker that optimizes your campaigns, enhances conversions and increases ROI.",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"license": "MIT",
 	"homepage": "https://cpvone.com",
 	"keywords": [
@@ -14,7 +14,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/cpvlab/n8n-nodes-cpvlab"
+		"url": "git+https://github.com/cpvlab/n8n-nodes-cpvlab.git"
 	},
 	"scripts": {
 		"build": "n8n-node build",
