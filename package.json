@@ -1,7 +1,7 @@
 {
 	"name": "n8n-nodes-cpvlab",
 	"description": "CPV One is a powerful and affordable Ad Tracker that optimizes your campaigns, enhances conversions and increases ROI.",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"license": "MIT",
 	"homepage": "https://cpvone.com",
 	"keywords": [
