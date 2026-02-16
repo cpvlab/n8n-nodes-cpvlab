@@ -30,7 +30,7 @@ n8n community nodes for integrating CPV Lab Pro API with your n8n workflows.
 This package provides custom n8n nodes for integrating with CPV Lab Pro, a powerful and affordable Ad and Affiliate Tracker that optimizes your campaigns, enhances conversions, and increases ROI.
 
 **Package Name:** n8n-nodes-cpvlab  
-**Version:** 1.0.0  
+**Version:** 1.0.3  
 **Author:** UptechVision Solutions  
 **Homepage:** [https://cpvone.com](https://cpvone.com)
 
@@ -589,5 +589,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ---
 
-**Last Updated:** January 7, 2026  
-**Package Version:** 1.0.0
+**Last Updated:** February 16, 2026  
+**Package Version:** 1.0.3

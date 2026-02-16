@@ -629,9 +629,9 @@ export class ManageCampaigns implements INodeType {
 
                 if (Array.isArray(response)) {
                     for (const item of response)
-                        returnData.push({ json: item } as INodeExecutionData);
+                        returnData.push({ json: item, pairedItem: { item: i } } as INodeExecutionData);
                 } else
-                    returnData.push({ json: response } as INodeExecutionData);
+                    returnData.push({ json: response, pairedItem: { item: i } } as INodeExecutionData);
             } catch (error) {
                 const errorResponse: { status: number, message: string } = { status: 0, message: '' };
 
@@ -652,7 +652,7 @@ export class ManageCampaigns implements INodeType {
                     errorResponse.message = error.message;
 
                 if (this.continueOnFail()) {
-                    returnData.push({ json: errorResponse } as INodeExecutionData);
+                    returnData.push({ json: errorResponse, pairedItem: { item: i } } as INodeExecutionData);
 
                     continue;
                 }

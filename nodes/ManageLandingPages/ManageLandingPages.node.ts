@@ -469,7 +469,7 @@ export class ManageLandingPages implements INodeType {
 
                 // Process the response and add it to the return data.
 
-                returnData.push({ json: response } as INodeExecutionData);
+                returnData.push({ json: response, pairedItem: { item: i } } as INodeExecutionData);
             } catch (error) {
                 const errorResponse: { status: number, message: string } = { status: 0, message: '' };
 
@@ -490,7 +490,7 @@ export class ManageLandingPages implements INodeType {
                     errorResponse.message = error.message;
 
                 if (this.continueOnFail()) {
-                    returnData.push({ json: errorResponse } as INodeExecutionData);
+                    returnData.push({ json: errorResponse, pairedItem: { item: i } } as INodeExecutionData);
 
                     continue;
                 }
