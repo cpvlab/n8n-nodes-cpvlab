@@ -49,7 +49,7 @@ npm install n8n-nodes-cpvlab
 ### From GitHub
 
 ```bash
-npm install github:radu-uptech/n8n-nodes-cpvlab
+npm install github:cpvlab/n8n-nodes-cpvlab
 ```
 
 ### In n8n
